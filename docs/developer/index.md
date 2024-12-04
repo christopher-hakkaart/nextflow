@@ -22,7 +22,7 @@ After installing IntelliJ IDEA, use the following steps to use it with Nextflow:
 
 5. After the import process completes, select **File > Project Structure...**.
 
-6. Select **Project**, and make sure that the **SDK** field contains Java 11 (or later).
+6. Select **Project**, and make sure that the **SDK** field contains Java 17 (or later).
 
 7. Go to **File > Settings > Editor > Code Style > Groovy > Imports** and apply the following settings:
 
@@ -88,7 +88,7 @@ Class diagrams are manually curated, so they might not always reflect the latest
 
 ## Building from source
 
-If you are interested in modifying the source code, you only need Java 11 or later to build Nextflow from source. Nextflow uses the [Gradle](http://www.gradle.org/) build automation system, but you do not need to install Gradle to build Nextflow. In other words, if you can run Nextflow, then you can probably build it too!
+If you are interested in modifying the source code, you only need Java 17 or later to build Nextflow from source. Nextflow uses the [Gradle](http://www.gradle.org/) build automation system, but you do not need to install Gradle to build Nextflow. In other words, if you can run Nextflow, then you can probably build it too!
 
 To build locally from a branch (useful for testing PRs):
 
