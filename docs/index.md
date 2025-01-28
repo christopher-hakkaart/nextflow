@@ -136,6 +136,14 @@ developer/plugins
 
 ```{toctree}
 :hidden:
+:caption: Troubleshooting
+:maxdepth: 1
+
+troubleshooting/cache-and-resume.md
+```
+
+```{toctree}
+:hidden:
 :caption: Tutorials
 :maxdepth: 1
 
