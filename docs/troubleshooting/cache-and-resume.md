@@ -6,32 +6,31 @@ Cache failures occur when a task that was supposed to be cached was re-executed 
 
 Common reasons for cache failures include:
 
+- Modified inputs
 - The `-resume` option not being enabled
 - Non-default {ref}`process-cache` directives
 - Files in the task cache and work directory being deleted, moved, or edited
-- Modified task inputs
 
-This page provides an overview of common causes for cache failures, strategies to identify them, and strategies to fix them.
+This page provides an overview of common causes for cache failures and strategies to identify and resolve them.
 
 (troubleshooting-modified)=
 
 ## Modified inputs
 
-The default caching mode uses the complete file path, the last modified timestamp, and the file size. If any of these attributes change the task will be re-executed.
+Modifying inputs that are used in the task hash will invalidate the cache. Common causes of modified inputs include:
 
-Modifying inputs that are used in the task hash will also invalidate the cache. Common causes of modified inputs include:
-
+- Changing input files
 - Resuming from a different session ID
 - Changing the process name
 - Changing the task container image or Conda environment
 - Changing the task script
-- Changing an input file or bundled script used by the task
+- Changing a bundled script used by the task
 
 :::{note}
 Changing the value of any directive, except {ref}`process-ext`, will not inactivate the task cache.
 :::
 
-If a process modifies its input files it cannot be resumed. Processes that modify their own input files are considered to be an anti-pattern and should be avoided.
+A hash for an input file is calculated from the complete file path, the last modified timestamp, and the file size to calculate. If any of these attributes change the task will be re-executed. If a process modifies its input files it cannot be resumed. Processes that modify their own input files are considered to be an anti-pattern and should be avoided.
 
 (troubleshooting-inconsistent)=
 
@@ -95,7 +94,7 @@ process gather {
 }
 ```
 
-In the above example, the inputs will be merged in the same was as the {ref}`operator-merge` operator. The inputs are may be incorrect, non-deterministic, and invalidate the cache.
+In the above example, the inputs will be merged without matching. This is the same way method used by the {ref}`operator-merge` operator. When merged, the inputs are incorrect, non-deterministic, and invalidate the cache.
 
 <h3>Solution</h3>
 
@@ -119,8 +118,62 @@ process gather {
 }
 ```
 
-## Resume from a specific run
+## Compare task hashes
 
+By identifying differences between hashes you can detect changes that may be causing cache failures.
 
+To compare the task hashes for a resumed run:
 
-## Debug a resumed run
+1. Run your pipeline with the `-log` and `-dump-hashes` options:
+
+    ```bash
+    nextflow -log run_initial.log run <pipeline> -dump-hashes
+    ```
+
+2. Run your pipeline with the `-log`, `-dump-hashes`, and `-resume` options:
+
+    ```bash
+    nextflow -log run_resumed.log run <pipeline> -dump-hashes -resume
+    ```
+
+3. Extract the task hash lines from each log:
+
+    ```bash
+    cat run_initial.log | grep 'INFO.*TaskProcessor.*cache hash' | cut -d ' ' -f 10- | sort | awk '{ print; print ""; }' > run_initial.tasks.log
+    cat run_resumed.log | grep 'INFO.*TaskProcessor.*cache hash' | cut -d ' ' -f 10- | sort | awk '{ print; print ""; }' > run_resumed.tasks.log
+    ```
+
+4. Compare the runs:
+
+    ```bash
+    diff run_initial.tasks.log run_resumed.tasks.log
+    ```
+
+    :::{tip}
+    You can also compare the hash lines using a graphical diff viewer.
+    :::
+
+By comparing these hashes, you can identify which tasks have changed between runs and potentially understand why certain tasks are being re-executed instead of using cached results.
+
+:::{versionadded} 23.10.0
+:::
+
+When using `-dump-hashes json`, the task hashes can be more easily extracted into a diff. Here is an example Bash script to perform two runs and produce a diff:
+
+```bash
+nextflow -log run_1.log run $pipeline -dump-hashes json
+nextflow -log run_2.log run $pipeline -dump-hashes json -resume
+
+get_hashes() {
+    cat $1 \
+    | grep 'cache hash:' \
+    | cut -d ' ' -f 10- \
+    | sort \
+    | awk '{ print; print ""; }'
+}
+
+get_hashes run_1.log > run_1.tasks.log
+get_hashes run_2.log > run_2.tasks.log
+
+diff run_1.tasks.log run_2.tasks.log
+```
