@@ -139,7 +139,7 @@ developer/plugins
 :caption: Troubleshooting
 :maxdepth: 1
 
-troubleshooting/cache-and-resume.md
+troubleshooting/cache-failures.md
 ```
 
 ```{toctree}

@@ -1,21 +1,39 @@
-(cache-failers-page)=
+(cache-failure-page)=
 
 # Cache failures
 
-Cache failures occur when a task that was supposed to be cached was re-executed or a task that was supposed to be re-executed was cached.
+Cache failures occur when a task that was supposed to be cached was re-executed or a task that was supposed to be re-executed was cached. This page provides an overview of common causes for cache failures and strategies to identify them.
 
-Common reasons for cache failures include:
+(cache-failure-common)=
 
-- Modified inputs
-- The `-resume` option not being enabled
-- Non-default {ref}`process-cache` directives
-- Files in the task cache and work directory being deleted, moved, or edited
+## Common causes
 
-This page provides an overview of common causes for cache failures and strategies to identify and resolve them.
+Common causes of cache failures include:
 
-(troubleshooting-modified)=
+- {ref}`Resume not being enabled <troubleshooting-resume>`
+- {ref}`Non-default cache directives <troubleshooting-directives>`
+- {ref}`Modified inputs <troubleshooting-modified>`
+- {ref}`Inconsistent file attributes <troubleshooting-inconsistent>`
+- {ref}`Race condition on a global variable <troubleshooting-race-condition>`
+- {ref}`Non-deterministic process inputs <troubleshooting-nondeterministic>`
 
-## Modified inputs
+These cache failure causes are described in detail below.
+
+(cache-failure-resume)=
+
+### Resume not enabled
+
+The `-resume` option is required to resume a pipeline. Ensure `-resume` has been enabled in your run command or your nextflow configuration file.
+
+(cache-failure-directives)=
+
+### Non-default cache directives
+
+
+
+(cache-failure-modified)=
+
+### Modified inputs
 
 Modifying inputs that are used in the task hash will invalidate the cache. Common causes of modified inputs include:
 
@@ -32,15 +50,15 @@ Changing the value of any directive, except {ref}`process-ext`, will not inactiv
 
 A hash for an input file is calculated from the complete file path, the last modified timestamp, and the file size to calculate. If any of these attributes change the task will be re-executed. If a process modifies its input files it cannot be resumed. Processes that modify their own input files are considered to be an anti-pattern and should be avoided.
 
-(troubleshooting-inconsistent)=
+(cache-failure-inconsistent)=
 
-## Inconsistent file attributes
+### Inconsistent file attributes
 
 Some shared file systems, such as NFS, may report inconsistent file timestamps. If you encounter this problem, use the `'lenient'` {ref}`caching mode <process-cache>` to ignore the last modified timestamp and use only the file path.
 
-(troubleshooting-race-condition)=
+(cache-failure-race-condition)=
 
-## Race condition on a global variable
+### Race condition on a global variable
 
 Race conditions can in disrupt caching behavior of your pipeline.
 
@@ -67,9 +85,9 @@ Alternatively, remove the variable:
     Channel.of(1,2,3) | map { v -> v * 2 } | view { v -> "ch2 = $v" }
     ```
 
-(cache-nondeterministic-inputs)=
+(cache-failure-nondeterministic)=
 
-## Non-deterministic process inputs
+### Non-deterministic process inputs
 
 A process that merges inputs from different sources non-deterministically may invalidate the cache.
 
@@ -118,6 +136,8 @@ process gather {
 }
 ```
 
+(cache-failure-compare)=
+
 ## Compare task hashes
 
 By identifying differences between hashes you can detect changes that may be causing cache failures.
@@ -127,13 +147,13 @@ To compare the task hashes for a resumed run:
 1. Run your pipeline with the `-log` and `-dump-hashes` options:
 
     ```bash
-    nextflow -log run_initial.log run <pipeline> -dump-hashes
+    nextflow -log run_initial.log run <PIPELINE> -dump-hashes
     ```
 
 2. Run your pipeline with the `-log`, `-dump-hashes`, and `-resume` options:
 
     ```bash
-    nextflow -log run_resumed.log run <pipeline> -dump-hashes -resume
+    nextflow -log run_resumed.log run <PIPELINE> -dump-hashes -resume
     ```
 
 3. Extract the task hash lines from each log:
@@ -158,7 +178,7 @@ By comparing these hashes, you can identify which tasks have changed between run
 :::{versionadded} 23.10.0
 :::
 
-When using `-dump-hashes json`, the task hashes can be more easily extracted into a diff. Here is an example Bash script to perform two runs and produce a diff:
+When using `-dump-hashes json`, the task hashes can be more easily extracted into a diff. See an example Bash script to compare two runs and produce a diff here:
 
 ```bash
 nextflow -log run_1.log run $pipeline -dump-hashes json
