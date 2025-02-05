@@ -140,6 +140,8 @@ developer/plugins
 :maxdepth: 1
 
 troubleshooting/cache-failures.md
+troubleshooting/aws.md
+troubleshooting/vscode.md
 ```
 
 ```{toctree}

@@ -10,14 +10,14 @@ Cache failures occur when a task that was supposed to be cached was re-executed 
 
 Common causes of cache failures include:
 
-- {ref}`Resume not being enabled <troubleshooting-resume>`
-- {ref}`Non-default cache directives <troubleshooting-directives>`
-- {ref}`Modified inputs <troubleshooting-modified>`
-- {ref}`Inconsistent file attributes <troubleshooting-inconsistent>`
-- {ref}`Race condition on a global variable <troubleshooting-race-condition>`
-- {ref}`Non-deterministic process inputs <troubleshooting-nondeterministic>`
+- {ref}`Resume not being enabled <cache-failure-resume>`
+- {ref}`Non-default cache directives <cache-failure-directives>`
+- {ref}`Modified inputs <cache-failure-modified>`
+- {ref}`Inconsistent file attributes <cache-failure-inconsistent>`
+- {ref}`Race condition on a global variable <cache-failure-race-condition>`
+- {ref}`Non-deterministic process inputs <cache-failure-nondeterministic>`
 
-These cache failure causes are described in detail below.
+These cache failure causes and solutions to resolve them are described in detail below.
 
 (cache-failure-resume)=
 
@@ -29,7 +29,16 @@ The `-resume` option is required to resume a pipeline. Ensure `-resume` has been
 
 ### Non-default cache directives
 
+The `cache` directive is enabled by default. However, you can disable or modify it's behavior for a specific process. For example:
 
+```nextflow
+process FOO {
+  cache false
+  // ...
+}
+```
+
+Ensure that the cache has not been set to a non-default value. See {ref}`process-cache` for more information about the `cache` directive.
 
 (cache-failure-modified)=
 
@@ -60,9 +69,7 @@ Some shared file systems, such as NFS, may report inconsistent file timestamps. 
 
 ### Race condition on a global variable
 
-Race conditions can in disrupt caching behavior of your pipeline.
-
-<h3>Problem example</h3>
+Race conditions can in disrupt caching behavior of your pipeline. For example:
 
 ```nextflow
 Channel.of(1,2,3) | map { v -> X=v; X+=2 } | view { v -> "ch1 = $v" }
@@ -71,9 +78,7 @@ Channel.of(1,2,3) | map { v -> X=v; X*=2 } | view { v -> "ch2 = $v" }
 
 In the above example, `X` is declared in each `map` closure. Without the `def` keyword, or other type qualifier, the variable `X` is global to the entire script. Operators and executed concurrently and, as `X` is global, there is a *race condition* that causes the emitted values to vary depending on the order of the concurrent operations. If these values were passed to a process as inputs the process would execute different tasks during each run due to the race condition.
 
-<h3>Solution</h3>
-
-Ensure the variable is not global by using a local variable:
+To resolve this failure type, ensure the variable is not global by using a local variable:
     
 ```nextflow
 Channel.of(1,2,3) | map { v -> def X=v; X+=2 } | view { v -> "ch1 = $v" }
@@ -81,17 +86,15 @@ Channel.of(1,2,3) | map { v -> def X=v; X+=2 } | view { v -> "ch1 = $v" }
 
 Alternatively, remove the variable:
 
-    ```nextflow
-    Channel.of(1,2,3) | map { v -> v * 2 } | view { v -> "ch2 = $v" }
-    ```
+```nextflow
+Channel.of(1,2,3) | map { v -> v * 2 } | view { v -> "ch2 = $v" }
+```
 
 (cache-failure-nondeterministic)=
 
 ### Non-deterministic process inputs
 
-A process that merges inputs from different sources non-deterministically may invalidate the cache.
-
-<h3>Problem example</h3>
+A process that merges inputs from different sources non-deterministically may invalidate the cache. For example:
 
 ```nextflow
 workflow {
@@ -114,9 +117,7 @@ process gather {
 
 In the above example, the inputs will be merged without matching. This is the same way method used by the {ref}`operator-merge` operator. When merged, the inputs are incorrect, non-deterministic, and invalidate the cache.
 
-<h3>Solution</h3>
-
-Ensure channels are deterministic by joining them before invoking the process:
+To resolve this failure type, ensure channels are deterministic by joining them before invoking the process:
 
 ```nextflow
 workflow {
@@ -178,7 +179,7 @@ By comparing these hashes, you can identify which tasks have changed between run
 :::{versionadded} 23.10.0
 :::
 
-When using `-dump-hashes json`, the task hashes can be more easily extracted into a diff. See an example Bash script to compare two runs and produce a diff here:
+Task hashes can also be extracted into a diff using `-dump-hashes json`. See an example Bash script to compare two runs and produce a diff here:
 
 ```bash
 nextflow -log run_1.log run $pipeline -dump-hashes json
