@@ -17,7 +17,7 @@ Common causes of cache failures include:
 - {ref}`Race condition on a global variable <cache-failure-race-condition>`
 - {ref}`Non-deterministic process inputs <cache-failure-nondeterministic>`
 
-These cache failure causes and solutions to resolve them are described in detail below.
+The causes of these cache failure and solutions to resolve them are described in detail below.
 
 (cache-failure-resume)=
 
@@ -173,8 +173,6 @@ To compare the task hashes for a resumed run:
     :::{tip}
     You can also compare the hash lines using a graphical diff viewer.
     :::
-
-By comparing these hashes, you can identify which tasks have changed between runs and potentially understand why certain tasks are being re-executed instead of using cached results.
 
 :::{versionadded} 23.10.0
 :::

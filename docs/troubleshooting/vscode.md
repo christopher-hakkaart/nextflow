@@ -2,16 +2,34 @@
 
 This page describes common errors and strategies strategies to resolve language server error.
 
+## Common errors
+
+### Filesystem changes
+
+The language server does not detect certain filesystem changes. For example, changing the current Git branch.
+
+To resolve this issue, restart the language server from the command palette to sync it with your workspace. See [Stop and restart](#stop-and-restart) for more information.
+
+### Third-party plugins
+
+The language server does not recognize configuration options from third-party plugins and will report unrecognized config option warnings. There is currently no solution to suppress them.
+
+### Groovy scripts
+
+The language server provides limited support for Groovy scripts in the lib directory. Errors in Groovy scripts are not reported as diagnostics, and changing a Groovy script does not automatically re-compile the Nextflow scripts that reference it.
+
+To resolve this issue, edit or close and re-open the Nextflow script to refresh the diagnostics.
+
 ## Stop and restart
 
 In the event of an error, you can stop or restart the language server from the Command Palette. The following commands are available:
 
-- Nextflow: Stop language server
-- Nextflow: Restart language server
+- `Nextflow: Stop language server`
+- `Nextflow: Restart language server`
 
-## Debug logs
+## View logs
 
-Logs can be viewed in VS Code to help debug the language server.
+Error logs can be useful for troubleshooting errors.
 
 To view logs in VS Code:
 
@@ -25,16 +43,6 @@ To show additional log messages in VS Code:
 3. Select the **Manage** icon.
 3. Enable **Nextflow > Debug** in the extension settings.
 
-## Filesystem changes
-
-The language server does not detect certain filesystem changes. For example, changing the current Git branch. Restart the language server from the command palette to sync it with your workspace. See [Stop and restart](#stop-and-restart) for more information.
-
-## Groovy scripts
-
-The language server provides limited support for Groovy scripts in the lib directory. Errors in Groovy scripts are not reported as diagnostics, and changing a Groovy script does not automatically re-compile the Nextflow scripts that reference it. Edit or close and re-open the Nextflow script to refresh the diagnostics.
-
 ## Report an issue
 
-Report issues at [`nextflow-io/vscode-language-nextflow`](https://github.com/nextflow-io/vscode-language-nextflow) or [`nextflow-io/language-server`](https://github.com/nextflow-io/language-server).
-
-When reporting issues, include a minimal code snippet that reproduces the issue and any error logs from the server.
+Report issues at [`nextflow-io/vscode-language-nextflow`](https://github.com/nextflow-io/vscode-language-nextflow) or [`nextflow-io/language-server`](https://github.com/nextflow-io/language-server). When reporting issues, include a minimal code snippet that reproduces the issue and any error logs from the server.
