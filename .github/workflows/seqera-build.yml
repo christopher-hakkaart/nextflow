@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: docs-repo
-        run: npm ci
+        run: npm install
 
       - name: Build documentation
         working-directory: docs-repo
