@@ -1,0 +1,37 @@
+name: Docs Preview
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  docs-preview:
+    runs-on: ubuntu-latest
+    env:
+      PR_BRANCH: ${{ github.head_ref }}
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Checkout seqeralabs/docs master
+        uses: actions/checkout@v4
+        with:
+          repository: seqeralabs/docs
+          ref: chris-poc-nextflow
+          path: docs-repo
+
+      - name: Update fetch-docs-oss.mjs to use PR branch for nextflow
+        run: |
+          sed -i "/repo: 'nextflow'/,/\}/s/branch: '[^']*'/branch: '${PR_BRANCH}'/" docs-repo/internal/fetch-docs-oss.mjs
+
+      - name: Install dependencies
+        working-directory: docs-repo
+        run: npm ci
+
+      - name: Build documentation
+        working-directory: docs-repo
+        run: npm run build
