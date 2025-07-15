@@ -36,13 +36,11 @@ jobs:
         working-directory: docs-repo
         run: npm run build
 
-      - name: Install Netlify CLI
-        run: npm install -g netlify-cli
-
       - name: Netlify deploy preview
         uses: netlify/actions/cli@master
         with:
-          args: deploy --dir=build --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN --json
+          args: deploy --dir=docs-repo/build --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN --alias=$PR_BRANCH --json
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          PR_BRANCH: ${{ github.head_ref }}
