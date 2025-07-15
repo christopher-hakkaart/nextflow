@@ -1,4 +1,4 @@
-name: Docs Preview
+name: Make docs preview
 
 on:
   pull_request:
