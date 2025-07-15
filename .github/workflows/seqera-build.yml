@@ -39,7 +39,7 @@ jobs:
       - name: Install Netlify CLI
         run: npm install -g netlify-cli
 
-      - name: Netlify Deploy Preview
+      - name: Netlify deploy preview
         uses: netlify/actions/cli@master
         with:
           args: deploy --dir=build --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN --json
