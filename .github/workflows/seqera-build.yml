@@ -52,5 +52,4 @@ jobs:
         run: |
           npx netlify --version
           set -x
-          ls -l docs-repo/build
           npx netlify deploy --debug --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} --site=${{ secrets.NETLIFY_SITE_ID }}
