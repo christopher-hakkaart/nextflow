@@ -42,7 +42,6 @@ jobs:
         env:
             NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
             NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-            EXCLUDE_CHANGELOG: false 
             EXCLUDE_PLATFORM_ENTERPRISE: false 
             EXCLUDE_PLATFORM_CLOUD: false 
             EXCLUDE_PLATFORM_API: true
