@@ -52,4 +52,5 @@ jobs:
             --dir=docs-repo/build \
             --site=$NETLIFY_SITE_ID \
             --auth=$NETLIFY_AUTH_TOKEN \
-            --prod=false
+            --no-build
+            --json
