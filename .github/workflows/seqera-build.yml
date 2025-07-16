@@ -33,22 +33,20 @@ jobs:
       - name: Build documentation
         working-directory: docs-repo
         run: npm run build
-
-      - name: Deploy Preview to Netlify
-        uses: nwtgck/actions-netlify@v3.0
-        with:
-          publish-dir: docs-repo/build  
-          production-deploy: false
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Deploy from GitHub Actions"
         env:
-            NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-            NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-            EXCLUDE_PLATFORM_ENTERPRISE: false 
-            EXCLUDE_PLATFORM_CLOUD: false 
+            EXCLUDE_PLATFORM_ENTERPRISE: true
+            EXCLUDE_PLATFORM_CLOUD: true
             EXCLUDE_PLATFORM_API: true
-            EXCLUDE_PLATFORM_OPENAPI: false 
+            EXCLUDE_PLATFORM_OPENAPI: true
             EXCLUDE_MULTIQC: true
-            EXCLUDE_NEXTFLOW: false 
+            EXCLUDE_NEXTFLOW: true
             EXCLUDE_FUSION: true
             EXCLUDE_WAVE: true
+
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
+
+      - name: Deploy Preview with Netlify CLI
+        run: |
+          npx netlify --version
+          npx netlify deploy --dir=docs-repo/build --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} --site=${{ secrets.NETLIFY_SITE_ID }} --no-build
