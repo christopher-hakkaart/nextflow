@@ -10,17 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PR_BRANCH: ${{ github.head_ref }}
-      EXCLUDE_CHANGELOG: false
-      EXCLUDE_PLATFORM_ENTERPRISE: false
-      EXCLUDE_PLATFORM_CLOUD: false
-      EXCLUDE_PLATFORM_API: true
-      EXCLUDE_PLATFORM_OPENAPI: true
-      EXCLUDE_MULTIQC: true 
-      EXCLUDE_FUSION: true 
-      EXCLUDE_WAVE: true
 
     steps:
-
       - name: Checkout seqeralabs/docs master
         uses: actions/checkout@v4
         with:
