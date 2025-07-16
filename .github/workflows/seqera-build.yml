@@ -30,7 +30,7 @@ jobs:
         working-directory: docs-repo
         run: npm install
 
-        - name: Deploy Preview to Netlify
+      - name: Deploy Preview to Netlify
         uses: nwtgck/actions-netlify@v3.0
         with:
           production-deploy: false
