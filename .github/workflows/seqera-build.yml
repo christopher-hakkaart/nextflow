@@ -39,19 +39,6 @@ jobs:
         run: npm install netlify-cli
 
       - name: Deploy to Netlify
-        id: netlify_deploy
-        env:
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        run: |
-          npx netlify deploy \
-            --dir=docs-repo/build \
-            --site=$NETLIFY_SITE_ID \
-            --auth=$NETLIFY_AUTH_TOKEN \
-            --no-build \
-            --json
-
-      - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2.0
         with:
           publish-dir: docs-repo/build  # Adjust this to your build output dir
