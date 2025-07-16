@@ -10,15 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PR_BRANCH: ${{ github.head_ref }}
-      EXCLUDE_CHANGELOG: false 
-      EXCLUDE_PLATFORM_ENTERPRISE: false 
-      EXCLUDE_PLATFORM_CLOUD: false 
-      EXCLUDE_PLATFORM_API: true
-      EXCLUDE_PLATFORM_OPENAPI: false 
-      EXCLUDE_MULTIQC: true
-      EXCLUDE_NEXTFLOW: false 
-      EXCLUDE_FUSION: true
-      EXCLUDE_WAVE: true
 
     steps:
       - name: Checkout seqeralabs/docs master
@@ -48,3 +39,13 @@ jobs:
           deploy-message: "Deploy from GitHub Actions"
           netlify-auth-token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           netlify-site-id: ${{ secrets.NETLIFY_SITE_ID }}
+        env:
+          EXCLUDE_CHANGELOG: false 
+          EXCLUDE_PLATFORM_ENTERPRISE: false 
+          EXCLUDE_PLATFORM_CLOUD: false 
+          EXCLUDE_PLATFORM_API: true
+          EXCLUDE_PLATFORM_OPENAPI: false 
+          EXCLUDE_MULTIQC: true
+          EXCLUDE_NEXTFLOW: false 
+          EXCLUDE_FUSION: true
+          EXCLUDE_WAVE: true
