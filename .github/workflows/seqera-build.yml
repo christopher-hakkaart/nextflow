@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PR_BRANCH: ${{ github.head_ref }}
-      EXCLUDE_CHANGELOG: true
-      EXCLUDE_PLATFORM_ENTERPRISE: true
-      EXCLUDE_PLATFORM_CLOUD: true
+      EXCLUDE_CHANGELOG: false
+      EXCLUDE_PLATFORM_ENTERPRISE: false
+      EXCLUDE_PLATFORM_CLOUD: false
       EXCLUDE_PLATFORM_API: true
       EXCLUDE_PLATFORM_OPENAPI: true
       EXCLUDE_MULTIQC: true 
