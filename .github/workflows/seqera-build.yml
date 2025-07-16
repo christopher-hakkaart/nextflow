@@ -50,4 +50,6 @@ jobs:
       - name: Deploy Preview with Netlify CLI
         run: |
           npx netlify --version
-          npx netlify deploy --dir=docs-repo/build --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} --site=${{ secrets.NETLIFY_SITE_ID }} --no-build  --debug
+          set -x
+          ls -l docs-repo/build
+          npx netlify deploy --no-build --debug --dir=docs-repo/build --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} --site=${{ secrets.NETLIFY_SITE_ID }}
