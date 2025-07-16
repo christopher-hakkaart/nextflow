@@ -1,4 +1,4 @@
-name: Make docs preview
+name: Deploy to Netlify preview
 
 on:
   pull_request:
