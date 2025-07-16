@@ -39,15 +39,10 @@ jobs:
         working-directory: docs-repo
         run: npm install
 
-      - name: Build documentation
-        working-directory: docs-repo
-        run: npm run build
-
       - name: Deploy Preview to Netlify
         working-directory: docs-repo
         uses: nwtgck/actions-netlify@v3.0
         with:
-          publish-dir: ./build
           production-deploy: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Deploy from GitHub Actions"
