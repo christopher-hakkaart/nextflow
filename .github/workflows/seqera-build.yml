@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PR_BRANCH: ${{ github.head_ref }}
-      EXCLUDE_CHANGELOG: "false"
+      EXCLUDE_CHANGELOG: false
       EXCLUDE_PLATFORM_ENTERPRISE: false 
       EXCLUDE_PLATFORM_CLOUD: false 
       EXCLUDE_PLATFORM_API: true
@@ -48,4 +48,4 @@ jobs:
         run: npm install -g netlify-cli
       
       - name: Deploy Preview with Netlify CLI
-        run: netlify deploy --dir=./docs-repo/build --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} --site=${{ secrets.NETLIFY_SITE_ID }} --message="Preview deploy from GitHub Actions" --no-build --json
+        run: pwd && ls && ls docs-repo && ls docs-repo/build && netlify deploy --dir=./docs-repo/build --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} --site=${{ secrets.NETLIFY_SITE_ID }} --no-build
