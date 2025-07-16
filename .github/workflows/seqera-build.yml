@@ -12,10 +12,6 @@ jobs:
       PR_BRANCH: ${{ github.head_ref }}
 
     steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
       - name: Checkout seqeralabs/docs master
         uses: actions/checkout@v4
@@ -52,5 +48,15 @@ jobs:
             --dir=docs-repo/build \
             --site=$NETLIFY_SITE_ID \
             --auth=$NETLIFY_AUTH_TOKEN \
-            --no-build
+            --no-build \
             --json
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          publish-dir: docs-repo/build  # Adjust this to your build output dir
+          deploy-message: "Deployed from GitHub Actions"
+          production-branch: master
+          deploy-to-production: false
+          netlify-auth-token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          netlify-site-id: ${{ secrets.NETLIFY_SITE_ID }}
