@@ -41,10 +41,13 @@ jobs:
           EXCLUDE_NEXTFLOW: true
           EXCLUDE_FUSION: true
           EXCLUDE_WAVE: true
+
+      - name: Checks
+        run: pwd && ls -l
       - name: Publish
         uses: netlify/actions/cli@master
         with:
-          args: deploy --dir=build --debug --no-build
+          args: deploy --debug --dir=build
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
