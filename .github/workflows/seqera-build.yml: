@@ -47,7 +47,7 @@ jobs:
         uses: South-Paw/action-netlify-cli@v2
         id: netlify
         with:
-          args: deploy --no-build --debug --dir dist
+          args: deploy --no-build --debug --dir build
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
