@@ -28,9 +28,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
-      - name: Look at build
-        run: ls -l build
       - name: Build documentation
         run: npm run build
         env:
