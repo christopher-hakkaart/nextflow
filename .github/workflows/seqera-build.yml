@@ -49,10 +49,12 @@ jobs:
             EXCLUDE_NEXTFLOW: true
             EXCLUDE_FUSION: true
             EXCLUDE_WAVE: true
-      - name: Install Netlify CLI
-        run: npm install -g netlify-cli
-
-      - name: Deploy Preview with Netlify CLI
-        run: |
-          npx netlify --version
-          npx netlify deploy --no-build --debug --dir=docs-repo/build --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} --site=${{ secrets.NETLIFY_SITE_ID }}
+      
+      - name: Deploy to Netlify
+        uses: South-Paw/action-netlify-cli@v2
+        id: netlify
+        with:
+          args: deploy --no-build --debug --dir 'docs-repo/build'
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
