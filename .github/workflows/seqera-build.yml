@@ -42,6 +42,8 @@ jobs:
             EXCLUDE_FUSION: true
             EXCLUDE_WAVE: true
       
+      - name: Build documentation
+        run: ls -l build
       - name: Deploy to Netlify no link
         uses: South-Paw/action-netlify-cli@v2
         id: netlify
