@@ -29,6 +29,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Look at build
+        run: ls -l build
       - name: Build documentation
         run: npm run build
         env:
@@ -42,11 +44,8 @@ jobs:
           EXCLUDE_FUSION: true
           EXCLUDE_WAVE: true
       
-      - name: Build documentation
+      - name: Look at build
         run: ls -l build
-
-      - name: Test Netlify API connectivity
-        run: curl -I https://api.netlify.com
       - name: Deploy to Netlify no link
         uses: South-Paw/action-netlify-cli@v2
         id: netlify
