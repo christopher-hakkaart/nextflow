@@ -10,8 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PR_BRANCH: ${{ github.head_ref }}
-
+    
     steps:
+      - uses: actions/setup-node@v3
+      - with:
+        node-version: 18
       - name: Checkout seqeralabs/docs master
         uses: actions/checkout@v4
         with:
@@ -26,12 +29,15 @@ jobs:
       - name: Remove nextflow_repo directory
         run: rm -rf nextflow_docs/nextflow_repo
 
-      - name: Install dependencies
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
+      - name: Install deps
         run: npm install
-        
-      - name: Build documentation
-        run: npm run build
+      - name: Build
+        run: netlify build
         env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
           EXCLUDE_CHANGELOG: true
           EXCLUDE_PLATFORM_ENTERPRISE: true
           EXCLUDE_PLATFORM_CLOUD: true
@@ -41,13 +47,9 @@ jobs:
           EXCLUDE_NEXTFLOW: true
           EXCLUDE_FUSION: true
           EXCLUDE_WAVE: true
-
-      - name: Checks
-        run: pwd && ls -l
-      - name: Publish
-        uses: netlify/actions/cli@master
-        with:
-          args: deploy --debug --dir=build
+    
+      - name: Deploy
+        run: netlify deploy --debug # this adds a 'dev--' prefix to my URL for testing
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
