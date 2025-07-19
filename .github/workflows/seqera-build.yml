@@ -10,8 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PR_BRANCH: ${{ github.head_ref }}
-    
-      steps:
+    steps:
       - name: Checkout seqeralabs/docs master
         uses: actions/checkout@v4
         with:
@@ -47,7 +46,7 @@ jobs:
           EXCLUDE_FUSION: true
           EXCLUDE_WAVE: true
       - name: Deploy
-        run: netlify deploy -- nob-build --debug # this adds a 'dev--' prefix to my URL for testing
+        run: netlify deploy -- no-build --debug # this adds a 'dev--' prefix to my URL for testing
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
