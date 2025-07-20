@@ -45,3 +45,20 @@ jobs:
           EXCLUDE_NEXTFLOW: false
           EXCLUDE_FUSION: true
           EXCLUDE_WAVE: true
+
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
+      - name: Deploy to Netlify (Preview)
+        run: netlify deploy --dir=build --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN --no-build
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          EXCLUDE_CHANGELOG: true
+          EXCLUDE_PLATFORM_ENTERPRISE: true
+          EXCLUDE_PLATFORM_CLOUD: true
+          EXCLUDE_PLATFORM_API: true
+          EXCLUDE_PLATFORM_OPENAPI: true
+          EXCLUDE_MULTIQC: true
+          EXCLUDE_NEXTFLOW: false
+          EXCLUDE_FUSION: true
+          EXCLUDE_WAVE: true
