@@ -48,5 +48,6 @@ jobs:
           --site=${{ secrets.NETLIFY_STAGING_SITE_ID }} \
           --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} \
           --alias=deploy-preview-${{ github.event.number }} \
-          --timeout=600
+          --timeout=600 \
+          --force
           echo "Deployment completed"
