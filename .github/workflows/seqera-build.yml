@@ -49,5 +49,5 @@ jobs:
           --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} \
           --alias=deploy-preview-${{ github.event.number }} \
           --timeout=600 \
-          --force
+          --skip-functions-cache
           echo "Deployment completed"
