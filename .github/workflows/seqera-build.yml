@@ -1,4 +1,4 @@
-name: Docs Preview
+name: Deploy to Netlify preview
 
 on:
   pull_request:
@@ -10,28 +10,44 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PR_BRANCH: ${{ github.head_ref }}
-
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      EXCLUDE_CHANGELOG: true
+      EXCLUDE_PLATFORM_ENTERPRISE: true
+      EXCLUDE_PLATFORM_CLOUD: true
+      EXCLUDE_PLATFORM_API: true
+      EXCLUDE_PLATFORM_OPENAPI: true
+      EXCLUDE_MULTIQC: true
+      EXCLUDE_NEXTFLOW: false
+      EXCLUDE_FUSION: true
+      EXCLUDE_WAVE: true
     steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
       - name: Checkout seqeralabs/docs master
         uses: actions/checkout@v4
         with:
           repository: seqeralabs/docs
           ref: chris-poc-nextflow
-          path: docs-repo
-
+          path: ./
       - name: Update fetch-docs-oss.mjs to use PR branch for nextflow
         run: |
-          sed -i "/repo: 'nextflow'/,/\}/s/branch: '[^']*'/branch: '${PR_BRANCH}'/" docs-repo/internal/fetch-docs-oss.mjs
-
-      - name: Install dependencies
-        working-directory: docs-repo
-        run: npm ci
-
-      - name: Build documentation
-        working-directory: docs-repo
+          sed -i "/repo: 'nextflow'/,/\}/s/branch: '[^']*'/branch: '${PR_BRANCH}'/" internal/fetch-docs-oss.mjs
+      - name: Remove nextflow_repo directory
+        run: rm -rf nextflow_docs/nextflow_repo
+      - name: Install deps
+        run: npm install
+      - name: Build
         run: npm run build
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
+
+      - name: Deploy to Netlify
+        run: |
+          echo "Starting Netlify deployment..."
+          netlify deploy \
+          --dir=./build \
+          --site=${{ secrets.NETLIFY_STAGING_SITE_ID }} \
+          --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} \
+          --alias=deploy-preview-${{ github.event.number }} \
+          --timeout=600 \
+          --skip-functions-cache
+          echo "Deployment completed"
