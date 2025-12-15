@@ -2,31 +2,21 @@
 
 # Workflows
 
-In Nextflow, a **workflow** is a function that is specialized for composing {ref}`processes <process-page>` and dataflow logic.
+A **workflow** composes {ref}`processes <process-page>` and dataflow logic to define how data flows through your pipeline. A Nextflow script typically includes:
 
-See {ref}`syntax-workflow` for a full description of the workflow syntax.
+- **[Parameters](#parameters)** - Configurable inputs
+- **[Entry workflow](#entry-workflow)** - Main entrypoint that orchestrates the pipeline
+- **[Named workflows](#named-workflows)** - Reusable workflow components that can be called by other workflows
+- **[Dataflow](#dataflow)** - Channels and operators connecting processes
+- **[Outputs](#outputs)** - Published results
 
-:::{note}
-Workflows were introduced in DSL2. If you are still using DSL1, see {ref}`dsl1-page` for more information about how to migrate your Nextflow pipelines to DSL2.
-:::
-
-## Entry workflow
-
-A script can define up to one *entry workflow*, which does not have a name and serves as the entrypoint of the script:
-
-```nextflow
-workflow {
-    channel.of('Bonjour', 'Ciao', 'Hello', 'Hola')
-        .map { v -> "$v world!" }
-        .view()
-}
-```
+For detailed syntax and usage instructions, see {ref}`syntax-workflow`.
 
 (workflow-params-def)=
 
 ## Parameters
 
-Parameters can be declared in a Nextflow script with the `params` block or with *legacy* parameter declarations.
+Parameters are configurable variables that control pipeline behavior. You can declare parameters with [typed parameters](#typed-parameters) in the `params` block or with [legacy parameters](#legacy-parameters) to customize pipeline behavior at runtime.
 
 ### Typed parameters
 
@@ -41,7 +31,7 @@ export NXF_SYNTAX_PARSER=v2
 ```
 :::
 
-A script can declare parameters using the `params` block:
+Typed parameters are parameters with explicit type annotations that ensure type safety and provide validation at runtime. You can declare typed parameters using the `params` block:
 
 ```nextflow
 params {
@@ -53,7 +43,7 @@ params {
 }
 ```
 
-The following types can be used for parameters:
+The following parameter types are available:
 
 - {ref}`stdlib-types-boolean`
 - {ref}`stdlib-types-float`
@@ -61,7 +51,7 @@ The following types can be used for parameters:
 - {ref}`stdlib-types-path`
 - {ref}`stdlib-types-string`
 
-Parameters can be used in the entry workflow:
+You can use parameters in the entry workflow:
 
 ```nextflow
 workflow {
@@ -70,18 +60,18 @@ workflow {
 ```
 
 :::{note}
-As a best practice, parameters should only be referenced in the entry workflow or `output` block. Parameters can be passed to workflows and processes as explicit inputs.
+Parameters should be referenced only in the entry workflow or `output` block. Pass parameters to workflows and processes as explicit inputs.
 :::
 
-The default value can be overridden by the command line, params file, or config file. Parameters from multiple sources are resolved in the order described in {ref}`cli-params`. Parameters specified on the command line are converted to the appropriate type based on the corresponding type annotation.
+You can override default parameter values by the command line, params file, or config file. Nextflow resolves parameters from multiple sources in the order described in {ref}`cli-params`. Nextflow converts parameters specified on the command line to the appropriate type based on its type annotation.
 
-A parameter that doesn't specify a default value is a *required* param. If a required param is not given a value at runtime, the run will fail.
+A parameter that doesn't specify a default value is a *required parameter*. If you do not supply a value for a required parameter at runtime, the run will fail.
 
 (workflow-params-legacy)=
 
 ### Legacy parameters
 
-Parameters can be declared by assigning a `params` property to a default value:
+Legacy parameters are the traditional untyped parameter declaration style that uses property assignment. You can declare legacy parameters by assigning a `params` property to a default value:
 
 ```nextflow
 params.input = '/some/data/file'
@@ -95,23 +85,35 @@ workflow {
 }
 ```
 
-The default value can be overridden by the command line, params file, or config file. Parameters from multiple sources are resolved in the order described in {ref}`cli-params`.
+You can override default values by using the command line, a params file, or a config file. See {ref}`cli-params`  for more information about how parameters from multiple sources are resolved.
+
+## Entry workflow
+
+The *entry workflow* is the unnamed workflow that serves as the entry point of your script. Each script can have up to one unnamed entry workflow:
+
+```nextflow
+workflow {
+    channel.of('Bonjour', 'Ciao', 'Hello', 'Hola')
+        .map { v -> "$v world!" }
+        .view()
+}
+```
 
 (workflow-output-def)=
 
 ## Outputs
 
 :::{versionadded} 25.10.0
-This feature is available as a preview in Nextflow {ref}`24.04 <workflow-outputs-first-preview>`, {ref}`24.10 <workflow-outputs-second-preview>`, and {ref}`25.04 <workflow-outputs-third-preview>`.
+Workflow outputs are available as a preview in Nextflow {ref}`24.04 <workflow-outputs-first-preview>`, {ref}`24.10 <workflow-outputs-second-preview>`, and {ref}`25.04 <workflow-outputs-third-preview>`.
 :::
 
 :::{note}
 Workflow outputs are intended to replace the {ref}`publishDir <process-publishdir>` directive. See {ref}`migrating-workflow-outputs` for guidance on migrating from `publishDir` to workflow outputs.
 :::
 
-A script can define an *output block* which declares the top-level outputs of the workflow. Each output should be assigned in the `publish` section of the entry workflow. Any channel in the workflow can be assigned to an output, including process and subworkflow outputs.
+Workflow outputs define the final results that a pipeline publishes when execution completes. You can define an *output block* to declare your workflow's top-level outputs. Assign outputs in the `publish` section of the entry workflow. You can assign any channel, including process and subworkflow outputs.
 
-Here is a basic example:
+**Example:**
 
 ```nextflow
 process fetch {
@@ -128,23 +130,23 @@ workflow {
     ch_samples = fetch(params.input)
 
     publish:
+    // Assign ch_samples to the samples workflow output
     samples = ch_samples
 }
 
 output {
+    // Assign ch_samples to the samples workflow output
     samples {
         path '.'
     }
 }
 ```
 
-In the above example, the output of process `fetch` is assigned to the `samples` workflow output. How this output is published to a directory structure is described in the next section.
-
 (workflow-publishing-files)=
 
 ### Publishing files
 
-The top-level output directory of a workflow run can be set using the `-output-dir` command-line option or the `outputDir` config option:
+Publishing files is the process of copying or linking output files from the work directory to a designated output directory. You can set the top-level output directory for a run using the `-output-dir` command-line option or the `outputDir` config option:
 
 ```bash
 nextflow run main.nf -output-dir 'my-results'
@@ -157,7 +159,7 @@ outputDir = 'my-results'
 
 The default output directory is `results` in the launch directory.
 
-By default, all output files are published to the output directory. Each output in the output block can define where files are published using the `path` directive. For example:
+By default, Nextflow publishes all output files to the output directory. Each output in the output block can define where Nextflow publishes files using the `path` directive:
 
 ```nextflow
 workflow {
@@ -190,7 +192,7 @@ results/
     └── ...
 ```
 
-All files received by an output are published into the specified directory. Lists, maps, and tuples are recursively scanned for nested files. For example:
+Nextflow publishes all files received by an output into the specified directory. Nextflow recursively scans lists, maps, and tuples for nested files:
 
 ```nextflow
 workflow {
@@ -204,7 +206,7 @@ workflow {
 }
 ```
 
-The `path` directive can also be a closure which defines a custom publish path for each channel value:
+The `path` directive can also be a closure that defines a custom publish path for each channel value:
 
 ```nextflow
 workflow {
@@ -219,14 +221,13 @@ workflow {
 
 output {
     samples {
+        // Publish pairs of FASTQ files to subdirectory based on sample ID
         path { sample -> "fastq/${sample.id}/" }
     }
 }
 ```
 
-The above example publishes each channel value to a different subdirectory. In this case, each pair of FASTQ files is published into a subdirectory based on the sample ID.
-
-The closure can even define a different path for each individual file using the `>>` operator:
+You can define a different path for each individual file using the `>>` operator:
 
 ```nextflow
 output {
@@ -239,15 +240,15 @@ output {
 }
 ```
 
-Each `>>` specifies a *source file* and *publish target*. The source file should be a file or collection of files, and the publish target should be a directory or file name. If the publish target ends with a slash, it is treated as the directory in which source files are published. Otherwise, it is treated as the target filename of a source file. Only files that are published with the `>>` operator are saved to the output directory.
+Each `>>` specifies a *source file* and *publish target*. The source file should be a file or collection of files, and the publish target should be a directory or file name. If the publish target ends with a slash, Nextflow treats it as the directory in which to publish source files.
 
 :::{note}
-Files that do not originate from the work directory are not published.
+Nextflow does not publish files that do not originate from the work directory.
 :::
 
 ### Index files
 
-Each output can create an index file of the values that were published. An index file preserves the structure of channel values, including metadata, which is simpler than encoding this information with directories and file names. The index file can be a CSV (`.csv`), JSON (`.json`), or YAML (`.yml`, `.yaml`) file. The channel values should be files, lists, maps, or tuples.
+Index files are structured metadata files (CSV, JSON, or YAML) that catalog published outputs along with their associated metadata. An index file preserves the structure of channel values, including metadata, which is simpler than encoding this information with directories and file names. The index file can be a CSV (`.csv`), JSON (`.json`), or YAML (`.yml`, `.yaml`) file. The channel values should be files, lists, maps, or tuples.
 
 For example:
 
@@ -274,7 +275,7 @@ output {
 }
 ```
 
-The above example writes the following CSV file to `results/samples.csv`:
+This example writes the following CSV file to `results/samples.csv`:
 
 ```
 "1","sample 1","results/fastq/1a.fastq","results/fastq/1b.fastq"
@@ -302,53 +303,10 @@ This example produces the following index file:
 ```
 
 :::{note}
-Files that do not originate from the work directory are not published, but are included in the index file.
+Nextflow does not publish files that do not originate from the work directory, but includes them in the index file.
 :::
 
-See [Output directives](#output-directives) for the list of available index directives.
-
-### Output directives
-
-The following directives are available for each output in the output block:
-
-`index`
-: Create an index file containing a record of each published value.
-
-  The following directives are available in an index definition:
-
-  `header`
-  : When `true`, the keys of the first record are used as the column names (default: `false`). Can also be a list of column names. Only used for CSV files.
-
-  `path`
-  : The name of the index file relative to the base output directory (required). Can be a CSV, JSON, or YAML file.
-
-  `sep`
-  : The character used to separate values (default: `','`). Only used for CSV files.
-
-`label`
-: Specify a label to be applied to every published file. Can be specified multiple times.
-
-`path`
-: Specify the publish path relative to the output directory (default: `'.'`). Can be a path, a closure that defines a custom directory for each published value, or a closure that publishes individual files using the `>>` operator.
-
-Additionally, the following options from the {ref}`workflow <config-workflow>` config scope can be specified as directives:
-- `contentType`
-- `enabled`
-- `ignoreErrors`
-- `mode`
-- `overwrite`
-- `storageClass`
-- `tags`
-
-For example:
-
-```nextflow
-output {
-    samples {
-        mode 'copy'
-    }
-}
-```
+See {ref}`outputs-page` for the reference list of index directives.
 
 ## Named workflows
 
@@ -365,11 +323,11 @@ workflow {
 }
 ```
 
-The above example defines a workflow named `my_workflow` which is called by the entry workflow. Both `hello` and `bye` could be any other process or workflow.
+This example defines a workflow named `my_workflow` that is called by the entry workflow. Both `hello` and `bye` could be any other process or workflow.
 
 ### Takes and emits
 
-The `take:` section declares the inputs of a named workflow:
+Takes and emits are named workflow interface declarations that define workflow inputs and outputs respectively. The `take:` section declares the inputs of a named workflow:
 
 ```nextflow
 workflow my_workflow {
@@ -383,7 +341,7 @@ workflow my_workflow {
 }
 ```
 
-Inputs can be specified like arguments when calling the workflow:
+You can specify inputs like arguments when calling the workflow:
 
 ```nextflow
 workflow {
@@ -406,7 +364,7 @@ workflow my_workflow {
 
 When calling the workflow, the output can be accessed using the `out` property, i.e. `my_workflow.out`.
 
-If an output is assigned to a name, the name can be used to reference the output from the calling workflow. For example:
+If an output is assigned to a name, the name can be used to reference the output from the calling workflow:
 
 ```nextflow
 workflow my_workflow {
@@ -419,7 +377,7 @@ workflow my_workflow {
 }
 ```
 
-The result of the above workflow can be accessed using `my_workflow.out.my_data`.
+You can access the result of this workflow using `my_workflow.out.my_data`.
 
 :::{note}
 Every output must be assigned to a name when multiple outputs are declared.
@@ -444,7 +402,7 @@ workflow my_workflow {
 }
 ```
 
-In the above example, `my_workflow` takes a channel of files (`Channel<Path>`) and emits a dataflow value with a single file (`Value<Path>`). See {ref}`stdlib-types` for the list of available types.
+In this example, `my_workflow` takes a channel of files (`Channel<Path>`) and emits a dataflow value with a single file (`Value<Path>`). See {ref}`stdlib-types` for the list of available types.
 
 (dataflow-page)=
 
@@ -486,23 +444,23 @@ Channel operators, or *operators* for short, are functions that consume and prod
 
 Commonly used operators include:
 
-- {ref}`operator-combine`: emit the combinations of two channels
+- {ref}`operator-combine`: Emit the combinations of two channels
 
-- {ref}`operator-collect`: collect the values from a channel into a list
+- {ref}`operator-collect`: Collect the values from a channel into a list
 
-- {ref}`operator-filter`: select the values in a channel that satisfy a condition
+- {ref}`operator-filter`: Select the values in a channel that satisfy a condition
 
-- {ref}`operator-flatMap`: transform each value from a channel into a list and emit each list element separately
+- {ref}`operator-flatMap`: Transform each value from a channel into a list and emit each list element separately
 
-- {ref}`operator-grouptuple`: group the values from a channel based on a grouping key
+- {ref}`operator-grouptuple`: Group the values from a channel based on a grouping key
 
-- {ref}`operator-join`: join the values from two channels based on a matching key
+- {ref}`operator-join`: Join the values from two channels based on a matching key
 
-- {ref}`operator-map`: transform each value from a channel with a mapping function
+- {ref}`operator-map`: Transform each value from a channel with a mapping function
 
-- {ref}`operator-mix`: emit the values from multiple channels
+- {ref}`operator-mix`: Emit the values from multiple channels
 
-- {ref}`operator-view`: print each value in a channel to standard output
+- {ref}`operator-view`: Print each value in a channel to standard output
 
 See {ref}`operator-page` for the full list of operators.
 
@@ -510,11 +468,9 @@ See {ref}`operator-page` for the full list of operators.
 
 ### Values
 
-A *dataflow value* is an asynchronous value.
+A *dataflow value* is an asynchronous value created using the {ref}`channel.value <channel-value>` factory or by processes under {ref}`certain conditions <process-out-singleton>`.
 
-Dataflow values can be created using the {ref}`channel.value <channel-value>` factory, and they are created by processes (under {ref}`certain conditions <process-out-singleton>`).
-
-A dataflow value cannot be accessed directly, but only through an operator or process. For example:
+You can access dataflow values directly through operators or processes:
 
 ```nextflow
 channel.value(1).view { v -> "dataflow value is ${v}" }
@@ -530,7 +486,7 @@ See {ref}`stdlib-types-value` for the set of available methods for dataflow valu
 
 ### Calling processes and workflows
 
-Processes and workflows are called like functions, passing their inputs as arguments:
+Process and workflow invocation is the mechanism for executing processes and composing workflows by passing channel data between them. Processes and workflows are called like functions, passing their inputs as arguments:
 
 ```nextflow
 process hello {
@@ -571,82 +527,44 @@ workflow {
 }
 ```
 
-Processes and workflows have a few extra rules for how they can be called:
+Only workflows can call processes and other workflows. Each process or workflow can only be called once per workflow. Use {ref}`module-aliases` to call them multiple times.
 
-- Processes and workflows can only be called by workflows
+**Accessing outputs**
 
-- A given process or workflow can only be called once in a given workflow. To use a process or workflow multiple times in the same workflow, use {ref}`module-aliases`.
-
-The "return value" of a process or workflow call is the process outputs or workflow emits, respectively. The return value can be assigned to a variable or passed into another call:
+Process and workflow outputs can be assigned to variables, passed to other calls, or accessed using the `.out` property:
 
 ```nextflow
-workflow hello_bye {
-    take:
-    data
-
-    main:
-    bye_out = bye(hello(data))
-
-    emit:
-    bye_out
-}
-
 workflow {
     data = channel.fromPath('/some/path/*.txt')
-    bye_out = hello_bye(data)
-}
-```
 
-Named outputs can be accessed as properties of the return value:
+    // Assign to variable
+    result = hello_bye(data)
 
-```nextflow
-workflow hello_bye {
-    take:
-    data
-
-    main:
-    hello_out = hello(data)
-    bye_out = bye(hello_out.txt)
-
-    emit:
-    bye = bye_out.txt
-}
-
-workflow {
-    data = channel.fromPath('/some/path/*.txt')
-    flow_out = hello_bye(data)
-    bye_out = flow_out.bye
-}
-```
-
-As a convenience, process and workflow outputs can also be accessed without first assigning to a variable, by using the `.out` property of the process or workflow name:
-
-```nextflow
-workflow hello_bye {
-    take:
-    data
-
-    main:
-    hello(data)
-    bye(hello.out)
-
-    emit:
-    bye = bye.out
-}
-
-workflow {
-    data = channel.fromPath('/some/path/*.txt')
-    hello_bye(data)
+    // Access using .out property
     hello_bye.out.bye.view()
 }
 ```
 
-:::{note}
-Process named outputs are defined using the `emit` option on a process output. See {ref}`naming process outputs <process-naming-outputs>` for more information.
-:::
+Named outputs are accessed as properties:
+
+```nextflow
+workflow hello_bye {
+    main:
+    hello()
+    bye(hello.out)
+
+    emit:
+    bye_result = bye.out.txt
+}
+
+workflow {
+    hello_bye(data)
+    hello_bye.out.bye_result.view()
+}
+```
 
 :::{note}
-Process and workflow outputs can also be accessed by index (e.g., `hello.out[0]`, `hello.out[1]`, etc.). As a best practice, multiple outputs should be accessed by name.
+You can also access outputs by index (e.g., `hello.out[0]`), but use named outputs when possible.
 :::
 
 Workflows can be composed in the same way:
@@ -684,18 +602,18 @@ workflow {
 ```
 
 :::{note}
-The same process can be called in different workflows without using an alias, like `tick` in the above example, which is used in both `flow1` and `flow2`. The workflow call stack determines the *fully qualified process name*, which is used to distinguish the different process calls, i.e. `flow1:tick` and `flow2:tick` in the above example.
+You can call the same process in different workflows without using an alias. For example, `tick` in this example is used in both `flow1` and `flow2`. The workflow call stack determines the *fully qualified process name*, which distinguishes the different process calls, i.e. `flow1:tick` and `flow2:tick` in the above example.
 :::
 
 :::{tip}
-The fully qualified process name can be used as a {ref}`process selector <config-process-selectors>` in a Nextflow configuration file, and it takes priority over the simple process name.
+You can use the fully qualified process name as a {ref}`process selector <config-process-selectors>` in a Nextflow configuration file, and it takes priority over the simple process name.
 :::
 
 (workflow-special-operators)=
 
 ### Special operators
 
-The following operators have a special meaning when used in a workflow with process and workflow calls.
+Special operators are workflow-specific operators (`|` and `&`) that provide shorthand syntax for chaining and parallelizing process calls. The following operators have a special meaning when used in a workflow with process and workflow calls.
 
 :::{note}
 As a best practice, avoid these operators when {ref}`type checking <preparing-static-types>` is enabled. Using these operators will prevent the type checker from validating your code.
@@ -703,7 +621,7 @@ As a best practice, avoid these operators when {ref}`type checking <preparing-st
 
 **Pipe `|`**
 
-The `|` *pipe* operator can be used to chain processes, operators, and workflows:
+You can use the `|` operator to chain processes, operators, and workflows:
 
 ```nextflow
 process greet {
@@ -725,23 +643,9 @@ workflow {
 }
 ```
 
-The above snippet defines a process named `greet` and invokes it with the input channel. The result is then piped to the {ref}`operator-map` operator, which converts each string to uppercase, and finally to the {ref}`operator-view` operator which prints it.
-
-The same code can also be written as:
-
-```nextflow
-workflow {
-    ch_input = channel.of('Hello', 'Hola', 'Ciao')
-    ch_greet = greet(ch_input)
-    ch_greet
-        .map { v -> v.toUpperCase() }
-        .view()
-}
-```
-
 **And `&`**
 
-The `&` *and* operator can be used to call multiple processes in parallel with the same channel(s):
+You can use the `&` operator to call multiple processes in parallel with the same channel:
 
 ```nextflow
 process greet {
@@ -775,19 +679,6 @@ workflow {
 }
 ```
 
-In the above snippet, the initial channel is piped to the {ref}`operator-map` operator, which reverses the string value. Then, the result is passed to the processes `greet` and `to_upper`, which are executed in parallel. Each process outputs a channel, and the two channels are combined using the {ref}`operator-mix` operator. Finally, the result is printed using the {ref}`operator-view` operator.
-
-The same code can also be written as:
-
-```nextflow
-workflow {
-    ch = channel.of('Hello').map { v -> v.reverse() }
-    ch_greet = greet(ch)
-    ch_upper = to_upper(ch)
-    ch_greet.mix(ch_upper).view()
-}
-```
-
 (workflow-recursion)=
 
 ### Process and workflow recursion
@@ -799,7 +690,7 @@ workflow {
 This feature requires the `nextflow.preview.recursion` feature flag to be enabled.
 :::
 
-Processes can be invoked recursively using the `recurse` method.
+Process and workflow recursion is a pattern that allows a process or workflow to invoke itself repeatedly until a termination condition is met. You can invoke processes recursively using the `recurse` method.
 
 ```{literalinclude} snippets/recurse-process.nf
 :language: nextflow
@@ -809,7 +700,7 @@ Processes can be invoked recursively using the `recurse` method.
 :language: console
 ```
 
-In the above example, the `count_down` process is first invoked with the value `params.start`. On each subsequent iteration, the process is invoked again using the output from the previous iteration. The recursion continues until the specified condition is satisfied, as defined by the `until` method, which terminates the recursion.
+In this example, the `count_down` process first runs with the value `params.start`. On each subsequent iteration, the process is invoked again using the output from the previous iteration. The recursion continues until the specified condition is satisfied, as defined by the `until` method, which terminates the recursion.
 
 The recursive output can also be limited using the `times` method:
 
@@ -832,6 +723,6 @@ Workflows can also be invoked recursively:
 
 **Limitations**
 
-- A recursive process or workflow must have matching inputs and outputs, such that the outputs for each iteration can be supplied as the inputs for the next iteration.
+- A recursive process or workflow must have matching inputs and outputs so that each iteration can supply its outputs as inputs for the next iteration.
 
 - Recursive workflows cannot use *reduction* operators such as `collect`, `reduce`, and `toList`, because these operators cause the recursion to hang indefinitely after the initial iteration.
