@@ -13,7 +13,7 @@ Execute tasks with Sarus containers (default: `false`).
 
 ##### `sarus.envWhitelist`
 
-Comma-separated list of environment variable names to be included in the container environment.
+Comma-separated list of host environment variable names to export to the container environment. Each variable is read from the environment of the machine that runs the task. To set a variable to a specific value, use the [`env`](./env) scope instead.
 
 ##### `sarus.runOptions`
 

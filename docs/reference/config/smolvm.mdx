@@ -19,7 +19,7 @@ Specify additional options supported by the smolvm CLI (i.e., `smolvm [OPTIONS] 
 
 ##### `smolvm.envWhitelist`
 
-Comma separated list of environment variable names to be included in the VM environment.
+Comma separated list of host environment variable names to export to the VM environment. Other host environment variables are not passed to the VM, apart from a few that Nextflow passes itself. Each variable is read from the environment of the machine that runs the task. To set a variable to a specific value, use the [`env`](./env) scope instead.
 
 ##### `smolvm.network`
 

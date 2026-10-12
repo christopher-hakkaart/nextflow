@@ -17,7 +17,7 @@ Specify additional options supported by the Podman engine i.e. `podman [OPTIONS]
 
 ##### `podman.envWhitelist`
 
-Comma separated list of environment variable names to be included in the container environment.
+Comma separated list of host environment variable names to export to the container environment. By default, other host environment variables are not passed to the container, apart from proxy variables such as `http_proxy`, which Podman passes, and a few that Nextflow passes itself. Each variable is read from the environment of the machine that runs the task. To set a variable to a specific value, use the [`env`](./env) scope instead.
 
 ##### `podman.mountFlags`
 

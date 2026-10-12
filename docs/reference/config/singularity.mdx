@@ -29,7 +29,7 @@ Specify additional options supported by the Singularity engine i.e. `singularity
 
 ##### `singularity.envWhitelist`
 
-Comma separated list of environment variable names to be included in the container environment.
+Comma separated list of host environment variable names to export to the container environment. Other host environment variables are not passed to the container, apart from a few that Nextflow passes itself. Each variable is read from the environment of the machine that runs the task. To set a variable to a specific value, use the [`env`](./env) scope instead.
 
 ##### `singularity.libraryDir`
 

@@ -25,11 +25,15 @@ Specify additional options supported by the Docker engine i.e. `docker [OPTIONS]
 
 ##### `docker.envWhitelist`
 
-Comma separated list of environment variable names to be included in the container environment.
+Comma separated list of host environment variable names to export to the container environment. Other host environment variables are not passed to the container, apart from a few that Nextflow passes itself. Each variable is read from the environment of the machine that runs the task. To set a variable to a specific value, use the [`env`](./env) scope instead.
 
 ##### `docker.fixOwnership`
 
-Fix ownership of files created by the Docker container (default: `false`).
+Change the ownership of root-owned files in the task work directory to the user that runs the task (default: `false`).
+
+When enabled, after the task command completes successfully, Nextflow runs `chown -fR --from root` inside the container on the contents of the task work directory, including hidden files. Ownership is set to the UID and GID of the user that launches the container (`$(id -u):$(id -g)`). If the task command fails, ownership is not changed. Use this option when the container runs as root and creates files that you can't otherwise modify or delete. With the local and grid executors, this option applies only when Nextflow runs on Linux.
+
+The container image must provide a `chown` command that supports the `--from` option, such as GNU coreutils. BusyBox `chown` doesn't support it. If `chown` fails, the error is ignored and the files remain owned by root.
 
 ##### `docker.legacy`
 
